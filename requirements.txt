@@ -1,0 +1,9 @@
+--- Quiz Game ---
+
+1. Read a .csv file with questions and start a timer
+	a) The program reads questions from a .csv file
+		- You can provide it with -csv "your_problems_path.csv" path. // the path is a string
+		- The default file is problems.csv 
+	b) You can pass the time limit in seconds using the -limit flag ex. -limit 50
+2. When the time runs out stop the game, display a message and score
+
