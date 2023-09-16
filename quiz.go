@@ -2,11 +2,11 @@ package main
 
 import (
 	"encoding/csv"
+	"flag"
 	"fmt"
 	"log"
 	"os"
 	"strconv"
-	"flag"
 )
 
 type Question struct {
@@ -14,11 +14,7 @@ type Question struct {
 	answer  string
 }
 
-func main() {
-
-	var filepath string
-
-	flag.StringVar(&filepath, "filepath", "problems.csv", "Filepath to a csv where questions are stored")
+func getRecords(filepath string) [][]string {
 
 	file, err := os.Open(filepath)
 
@@ -26,7 +22,6 @@ func main() {
 		log.Fatal("Error while reading the file", err)
 	}
 
-	// closes the file
 	defer file.Close()
 
 	reader := csv.NewReader(file)
@@ -37,29 +32,53 @@ func main() {
 		fmt.Println("Error reading questions")
 	}
 
-	questions := make([]Question, len(records))
-	answers := make([]string, len(records))
+	return records
+}
 
-	// populate questions based on csv file
+func getQuestions(records [][]string) []Question {
+
+	questions := make([]Question, len(records))
+
 	for i, record := range records {
 		questions[i].content = record[0]
 		questions[i].answer = record[1]
 	}
 
+	return questions
+}
+
+func AskQuestions(questions []Question) int {
+	userAnswers := make([]string, len(questions))
+
 	// ask the questions
 	for i, question := range questions {
 		fmt.Print(question.content + ": ")
-		fmt.Scan(&answers[i])
+		fmt.Scan(&userAnswers[i])
 	}
 
-	// check how many correct answers
+	// check how many answers are correct
 	correctAnswers := 0
-	for i, answer := range answers {
+	for i, answer := range userAnswers {
 		if answer == questions[i].answer {
 			correctAnswers++
 		}
 	}
 
-	// display the score
-	fmt.Println("Your score is: " + strconv.Itoa(correctAnswers) + "/" + strconv.Itoa(len(records)))
+	return correctAnswers
+}
+
+func displayScore(correctAnswers int, questionsCount int) {
+	fmt.Println("Your score is: " + strconv.Itoa(correctAnswers) + "/" + strconv.Itoa(questionsCount))
+}
+
+func main() {
+	var filepath string
+	flag.StringVar(&filepath, "filepath", "problems.csv", "Filepath to a csv where questions are stored")
+	flag.Parse()
+
+	records := getRecords(filepath)
+	questions := getQuestions(records)
+	correctAnswers := AskQuestions(questions)
+
+	displayScore(correctAnswers, len(questions))
 }
