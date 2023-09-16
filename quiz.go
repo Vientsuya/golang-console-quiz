@@ -14,7 +14,7 @@ type Question struct {
 	answer  string
 }
 
-func getRecords(filepath string) [][]string {
+func GetRecords(filepath string) [][]string {
 
 	file, err := os.Open(filepath)
 
@@ -35,7 +35,7 @@ func getRecords(filepath string) [][]string {
 	return records
 }
 
-func getQuestions(records [][]string) []Question {
+func GetQuestions(records [][]string) []Question {
 
 	questions := make([]Question, len(records))
 
@@ -67,7 +67,7 @@ func AskQuestions(questions []Question) int {
 	return correctAnswers
 }
 
-func displayScore(correctAnswers int, questionsCount int) {
+func DisplayScore(correctAnswers int, questionsCount int) {
 	fmt.Println("Your score is: " + strconv.Itoa(correctAnswers) + "/" + strconv.Itoa(questionsCount))
 }
 
@@ -76,9 +76,9 @@ func main() {
 	flag.StringVar(&filepath, "filepath", "problems.csv", "Filepath to a csv where questions are stored")
 	flag.Parse()
 
-	records := getRecords(filepath)
-	questions := getQuestions(records)
+	records := GetRecords(filepath)
+	questions := GetQuestions(records)
 	correctAnswers := AskQuestions(questions)
 
-	displayScore(correctAnswers, len(questions))
+	DisplayScore(correctAnswers, len(questions))
 }
