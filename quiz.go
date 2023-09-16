@@ -48,19 +48,18 @@ func GetQuestions(records [][]string) []Question {
 }
 
 func AskQuestions(questions []Question) int {
-	userAnswers := make([]string, len(questions))
-
-	// ask the questions
-	for i, question := range questions {
-		fmt.Print(question.content + ": ")
-		fmt.Scan(&userAnswers[i])
-	}
-
-	// check how many answers are correct
 	correctAnswers := 0
-	for i, answer := range userAnswers {
-		if answer == questions[i].answer {
+
+	for i, question := range questions {
+		var userAnswer string
+		fmt.Printf("Problem #%d: %s = ", i+1, question.content)
+		fmt.Scan(&userAnswer)
+
+		if userAnswer == question.answer {
+			fmt.Println("Correct! \u2713")
 			correctAnswers++
+		} else {
+			fmt.Println("Wrong! \u2715")
 		}
 	}
 

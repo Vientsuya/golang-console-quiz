@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestGetRecordsFromFile(t *testing.T) {
+func TestGetRecords(t *testing.T) {
 	filePath := "elo.csv"
 	want := [][]string{
 		{"420+69", "489"},
@@ -53,5 +53,29 @@ func TestGetQuestions(t *testing.T) {
 				t.Errorf("GetQuestions() = %v, want %v", got, tt.want)
 			}
 		})
+	}
+}
+
+func TestCorrectAnswersCount(t *testing.T) {
+
+	questions := []Question{
+		{"What is 2 + 2?", "4"},
+		{"What is the capital of France?", "Paris"},
+		{"Who wrote Romeo and Juliet?", "Shakespeare"},
+	}
+
+	userAnswers := []string{"4", "London", "Shakespeare"}
+
+	correctAnswers := 0
+	for i, question := range questions {
+		if question.answer == userAnswers[i] {
+			correctAnswers++
+		}
+	}
+
+	expectedCorrectAnswers := 2
+
+	if correctAnswers != expectedCorrectAnswers {
+		t.Errorf("CorrectAnswersCount() = %d, want %d", correctAnswers, expectedCorrectAnswers)
 	}
 }
