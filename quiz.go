@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"time"
 )
 
 type Question struct {
@@ -47,19 +48,30 @@ func GetQuestions(records [][]string) []Question {
 	return questions
 }
 
-func AskQuestions(questions []Question) int {
+func AskQuestions(questions []Question, timeLimit int) int {
 	correctAnswers := 0
 
-	for i, question := range questions {
-		var userAnswer string
-		fmt.Printf("Problem #%d: %s = ", i+1, question.content)
-		fmt.Scan(&userAnswer)
+	timer := time.NewTimer(time.Duration(timeLimit) * time.Second)
 
-		if userAnswer == question.answer {
-			fmt.Println("Correct! \u2713")
-			correctAnswers++
-		} else {
-			fmt.Println("Wrong! \u2715")
+	for i, question := range questions {
+		fmt.Printf("Problem #%d: %s = ", i+1, question.content)
+		answerCh := make(chan string)
+		go func() {
+			var userAnswer string
+			fmt.Scan(&userAnswer)
+			answerCh <- userAnswer
+		}()
+		select {
+		case <-timer.C:
+			DisplayScore(correctAnswers, len(questions))
+			os.Exit(0)
+		case userAnswer := <- answerCh:
+			if userAnswer == question.answer {
+				fmt.Println("Correct! \u2713")
+				correctAnswers++
+			} else {
+				fmt.Println("Wrong! \u2715")
+			}
 		}
 	}
 
@@ -67,17 +79,18 @@ func AskQuestions(questions []Question) int {
 }
 
 func DisplayScore(correctAnswers int, questionsCount int) {
-	fmt.Println("Your score is: " + strconv.Itoa(correctAnswers) + "/" + strconv.Itoa(questionsCount))
+	fmt.Println("\n" + "Your score is: " + strconv.Itoa(correctAnswers) + "/" + strconv.Itoa(questionsCount) + "\n")
 }
 
 func main() {
 	var filepath string
+	var timeLimit int
 	flag.StringVar(&filepath, "filepath", "problems.csv", "Filepath to a csv where questions are stored")
+	flag.IntVar(&timeLimit, "timelimit", 30, "Time limit to answer the questions in seconds")
 	flag.Parse()
 
 	records := GetRecords(filepath)
 	questions := GetQuestions(records)
-	correctAnswers := AskQuestions(questions)
-
+	correctAnswers := AskQuestions(questions, timeLimit)
 	DisplayScore(correctAnswers, len(questions))
 }
